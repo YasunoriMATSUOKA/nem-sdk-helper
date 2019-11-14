@@ -6,4 +6,8 @@ console.log(nemSdkHelper);
 (async () => {
   var nis1NodeList = await nemSdkHelper.getNIS1NodeList();
   console.log(nis1NodeList);
+  var nis1HttpsNodeList = nemSdkHelper.getNIS1HttpsNodeList(nis1NodeList);
+  console.log(nis1HttpsNodeList);
+  var nis1HttpsRandomNode = nemSdkHelper.getNIS1HttpsRandomNode(nis1NodeList);
+  console.log(nis1HttpsRandomNode);
 })();

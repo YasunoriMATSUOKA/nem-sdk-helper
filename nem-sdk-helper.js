@@ -47,7 +47,7 @@ NemSdkHelper = (() => {
     },
     //Get NIS1 https random node
     getNIS1HttpsRandomNode: (nis1NodeList) => {
-      return nis1NodeList.https[floor(Math.random()*nis1NodeList.https.length)];
+      return nis1NodeList.https[Math.floor(Math.random()*nis1NodeList.https.length)];
     },
     
     //nem-sdk
@@ -64,7 +64,7 @@ NemSdkHelper = (() => {
         publicKey,
         nem.model.network.data.mainnet.id
       );
-      if isValidAddress(address){
+      if (isValidAddress(address)){
         return address;
       } else{
         return "";
