@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>JavaScript Test</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mocha/2.2.5/mocha.min.css">
+</head>
+
+<body>
+  <!-- テストにHTML要素が必要な場合はここに入力 -->
+  <div id="hoge">
+    <p>Hoge Hoge Fuga Fuga</p>
+  </div>
+  <!-- このサイトで使用するJSライブラリ(jQuery等) -->
+  <script src="nem-sdk.js"></script>
+  <!-- メインのJavaScript -->
+  <script src="nem-sdk-helper.js"></script>
+  <!-- mocha -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mocha/2.2.5/mocha.min.js"></script>
+  <!-- chai -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chai/3.0.0/chai.min.js"></script>
+  <!-- mocha初期化 -->
+  <script>
+    mocha.setup('bdd');
+  </script>
+  <!-- ここにテストコードを書く -->
+  <script src="test.js"></script>
+  <!-- mochaのUI -->
+  <div id="mocha"></div>
+  <!-- mochaを実行 -->
+  <script>
+    mocha.checkLeaks();
+    // 必要なら他のグローバルオブジェクトを配列に追記する
+    mocha.globals(['jQuery']);
+    mocha.run();
+  </script>
+</body>
+
+</html>
