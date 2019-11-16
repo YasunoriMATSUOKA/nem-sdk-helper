@@ -12,7 +12,7 @@
   <div id="hoge">
     <p>Hoge Hoge Fuga Fuga</p>
   </div>
-  <!-- このサイトで使用するJSライブラリ(jQuery等) -->
+  <!-- このサイトで使用するJSライブラリ -->
   <script src="nem-sdk.js"></script>
   <!-- メインのJavaScript -->
   <script src="nem-sdk-helper.js"></script>
@@ -32,7 +32,7 @@
   <script>
     mocha.checkLeaks();
     // 必要なら他のグローバルオブジェクトを配列に追記する
-    mocha.globals(['jQuery']);
+    // mocha.globals(['jQuery']);
     mocha.run();
   </script>
 </body>

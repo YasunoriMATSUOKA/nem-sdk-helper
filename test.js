@@ -17,3 +17,7 @@ describe('nem-sdk-helperのテスト', function () {
     }, Error);
   });
 });
+
+const test = class {
+  
+};

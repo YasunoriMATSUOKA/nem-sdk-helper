@@ -2,17 +2,65 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   <title>Example</title>
+  <script src="jquery-3.4.1.min.js"></script>
+  <script src="jquery.qrcode.min.js"></script>
   <script src="nem-sdk.js"></script>
   <script src="nem-sdk-helper.js"></script>
   <script src="example.js"></script>
 </head>
 
 <body>
-  <!---->
+  <h1>Send Transaction</h1>
+  <h2>Send Form</h2>
+  <p>
+    <label for="_senderPrivateKey">Sender private key: </label>
+    <input type="password" name="_senderPrivateKey" id="senderPrivateKey" required>
+  </p>
+  <p>
+    <label for="_recipientAddress">Recipient address: </label>
+    <input type="text" name="_recipientAddress" id="recipientAddress" required />
+  </p>
+  <p>
+    <label for="_sendingAmount">Sending Amount: </label>
+    <input type="number" name="_sendingAmount" id="sendingAmount" required />
+  </p>
+  <p>
+    <label for="_sendingMessage">Sending message: </label>
+    <input type="text" name="_sendingMessage" id="sendingMessage" />
+  </p>
+  <p>
+    <button onclick="send()">Send Tx</button>
+  </p>
+  <h2>Send Result</h2>
+  <p id="sendResult"></p>
+
+  <h1>Receive Transaction</h1>
+  <h2>Receive Form</h2>
+  <p>
+    <label for="_recipientAddress2">Recipient address: </label>
+    <input type="text" name="_recipientAddress2" id="recipientAddress2" required />
+  </p>
+  <p>
+    <label for="_receivingAmount">ReceivingAmount: </label>
+    <input type="number" name="_receivingAmount" id="receivingAmount" required />
+  </p>
+  <p>
+    <label for="_receivingMessage">Receiving message: </label>
+    <input type="text" name="_receivingMessage" id="receivingMessage" />
+  </p>
+  <p>
+    <button onclick="receive()">Receive Tx</button>
+  </p>
+  <h2>Invoice QR Code</h2>
+  <p>
+    <div id="qrInvoice"></div>
+  </p>
+  <h2>Receive Result</h2>
+  <p id="receiveResult"></p>
 </body>
 
 </html>
