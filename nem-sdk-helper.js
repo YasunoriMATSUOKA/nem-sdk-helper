@@ -191,8 +191,45 @@ NemSdkHelper = (() => {
       });
     },
     //Receive Tx (XEM only, with no encrypted message)
-    receiveTx: async (recipientAddress, amount, message, endpointUrl) => {
-      //
+    receiveTx: async (recipientAddress, amount, message) => {
+      const wsNodes = [
+        "http://alice5.nem.ninja",
+        "http://alice7.nem.ninja"
+      ];
+      const endpointUrl = wsNodes[Math.floor(Math.random() * wsNodes.length)];
+      const endpoint = nem.model.objects.create("endpoint")(endpointUrl, nem.model.nodes.websocketPort);
+      console.log(endpoint);
+      const connector = nem.com.websockets.connector.create(endpoint, recipientAddress);
+      console.log(connector);
+      const result = await connector.connect().then(() => {
+          console.log("Connected");
+          nem.com.websockets.subscribe.errors(
+            connector,
+            (res) => {
+              console.log("errors", res);
+            }
+          );
+          nem.com.websockets.requests.account.data(connector);
+          nem.com.websockets.requests.account.transactions.recent(connector);
+          nem.com.websockets.subscribe.account.transactions.recent(
+            connector,
+            (res) => {
+              console.log("subscribeRecent", res);
+            }
+          )
+          nem.com.websockets.subscribe.account.transactions.unconfirmed(
+            connector,
+            (res) => {
+              console.log("unconfirmed", res);
+              connector.close();
+              return res;
+            }
+          )
+        },
+        (err) => {
+          console.log(err);
+          return err;
+        })
     }
   };
 })();

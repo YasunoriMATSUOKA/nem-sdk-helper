@@ -34,7 +34,5 @@ const receive = async () => {
   const invoiceData = NemSdkHelper.getInvoiceData(recipientAddress, amount, message);
   console.log(invoiceData);
   NemSdkHelper.setInvoiceQrCode("qrInvoice", invoiceData);
-  document.getElementById("recipientAddress2").value = "";
-  document.getElementById("receivingAmount").value = "";
-  document.getElementById("receivingMessage").value = "";
+  await NemSdkHelper.receiveTx(recipientAddress, amount, message);
 };
