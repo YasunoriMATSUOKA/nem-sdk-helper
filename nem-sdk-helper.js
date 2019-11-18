@@ -75,17 +75,13 @@ NemSdkHelper = (() => {
     //Get address from private key
     getAddressFromPrivateKey: (rawPrivateKey) => {
       const privateKey = htmlEscape(rawPrivateKey).trim();
-      const keyPair = nem.crypto.keyPair.create(htmlEscape(privateKey));
+      const keyPair = nem.crypto.keyPair.create(privateKey);
       const publicKey = keyPair.publicKey.toString();
       const address = nem.model.address.toAddress(
         publicKey,
         nem.model.network.data.mainnet.id
       );
-      if (NemSdkHelper.isValidAddress(address)) {
-        return address;
-      } else {
-        return "";
-      }
+      return NemSdkHelper.isValidAddress(address) ? address : "";
     },
     //Get XEM balance
     getXemBalance: async (rawAddress, endpointUrl) => {
@@ -175,14 +171,16 @@ NemSdkHelper = (() => {
         "v": 2
       };
       json.data.addr = NemSdkHelper.getAddress(recipientAddress);
-      json.data.amount = Math.round(amount * 1000000);
-      json.data.msg = message;
+      json.data.amount = Math.round(htmlEscape(amount) * 1000000);
+      json.data.msg = htmlEscape(message);
       const stringData = JSON.stringify(json);
       return stringData;
     },
     //Set invoice QR Code
-    setInvoiceQrCode: (elementId, invoiceData) => {
+    setInvoiceQrCode: (rawElementId, invoiceData) => {
+      const elementId = htmlEscape(rawElementId);
       $(() => {
+        $(`#${elementId}`).empty();
         $(`#${elementId}`).qrcode({
           width: 256,
           height: 256,
@@ -190,18 +188,35 @@ NemSdkHelper = (() => {
         });
       });
     },
-    //Receive Tx (XEM only, with no encrypted message)
-    receiveTx: async (recipientAddress, amount, message) => {
+    //When Tx is received this function will be executed. (WIP: This function must be changed each users. It is not good. I want to delete this callback.)
+    txReceiveCallBack: (res) => {
+      console.log("hash", res.meta.hash.data);
+      console.log("intAmount", res.transaction.amount);
+      console.log("amount", res.transaction.amount / 1000000);
+      console.log("intFee", res.transaction.fee);
+      console.log("fee", res.transaction.fee / 1000000);
+      console.log("senderPublicKey", res.transaction.signer);
+      console.log("senderAddress", nem.model.address.toAddress(res.transaction.signer, nem.model.network.data.mainnet.id));
+      console.log("messagePayload", res.transaction.message);
+      console.log("message", nem.utils.format.hexToUtf8(res.transaction.message.payload));
+      document.getElementById("receiveResult").textContent = JSON.stringify(res);
+    },
+    //Receive Tx (XEM only, with no encrypted message) (WIP: This function does not have returned value.)
+    receiveTx: async (rawAddress, rawAmount, rawMessage) => {
+      const address = NemSdkHelper.getAddress(rawAddress);
+      const amount = htmlEscape(rawAmount); //Todo: Validate amount (divisibility check must be added)
+      const intAmount = Math.round(amount * 1000000);
+      const message = htmlEscape(rawMessage);
+      //WIP: I cannot use websocket on https node. Maybe wrong port no or CORS or any other reason?
+      //WIP: On many http nodes, websocket doesn't work well. But, on these two nodes, it works well. I don't know why.
       const wsNodes = [
         "http://alice5.nem.ninja",
         "http://alice7.nem.ninja"
       ];
       const endpointUrl = wsNodes[Math.floor(Math.random() * wsNodes.length)];
       const endpoint = nem.model.objects.create("endpoint")(endpointUrl, nem.model.nodes.websocketPort);
-      console.log(endpoint);
-      const connector = nem.com.websockets.connector.create(endpoint, recipientAddress);
-      console.log(connector);
-      const result = await connector.connect().then(() => {
+      const connector = nem.com.websockets.connector.create(endpoint, address);
+      connector.connect().then(() => {
           console.log("Connected");
           nem.com.websockets.subscribe.errors(
             connector,
@@ -209,27 +224,26 @@ NemSdkHelper = (() => {
               console.log("errors", res);
             }
           );
-          nem.com.websockets.requests.account.data(connector);
-          nem.com.websockets.requests.account.transactions.recent(connector);
-          nem.com.websockets.subscribe.account.transactions.recent(
-            connector,
-            (res) => {
-              console.log("subscribeRecent", res);
-            }
-          )
           nem.com.websockets.subscribe.account.transactions.unconfirmed(
             connector,
             (res) => {
               console.log("unconfirmed", res);
-              connector.close();
-              return res;
+              if (res.transaction.recipient === address) {
+                if (nem.utils.format.hexToUtf8(res.transaction.message.payload) === message) {
+                  if (res.transaction.amount === intAmount) {
+                    connector.close();
+                    NemSdkHelper.txReceiveCallBack(res); //This procedure will be executed when Tx incoming
+                    return res;
+                  }
+                }
+              }
             }
-          )
+          );
         },
-        (err) => {
-          console.log(err);
-          return err;
-        })
+        (error) => {
+          console.log(error);
+          return error;
+        });
     }
   };
 })();

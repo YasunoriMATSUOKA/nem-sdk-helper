@@ -27,12 +27,11 @@ const receive = async () => {
   const recipientAddress = NemSdkHelper.getAddress(document.getElementById("recipientAddress2").value);
   const amount = document.getElementById("receivingAmount").value;
   const message = document.getElementById("receivingMessage").value;
-  const nis1NodeList = await NemSdkHelper.getNIS1NodeList();
-  console.log(nis1NodeList);
-  const endpointUrl = NemSdkHelper.getNIS1HttpsRandomNodeUrl(nis1NodeList);
-  console.log(endpointUrl);
   const invoiceData = NemSdkHelper.getInvoiceData(recipientAddress, amount, message);
   console.log(invoiceData);
   NemSdkHelper.setInvoiceQrCode("qrInvoice", invoiceData);
-  await NemSdkHelper.receiveTx(recipientAddress, amount, message);
+  const receiveResult = await NemSdkHelper.receiveTx(recipientAddress, amount, message);
+  document.getElementById("recipientAddress2").value = "";
+  document.getElementById("receivingAmount").value = "";
+  document.getElementById("receivingMessage").value = "";
 };
